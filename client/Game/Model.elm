@@ -1,5 +1,7 @@
-module Game.Model exposing (Model(..))
+module Game.Model exposing (Model)
+
+import Renderer.Model as Renderer
 
 
-type Model
-    = Model
+type alias Model =
+    { renderer : Renderer.Model }
