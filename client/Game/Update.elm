@@ -1,7 +1,6 @@
-module Game.Orchestrator exposing (init, update, view)
+module Game.Update exposing (init, update)
 
 import Game.Model exposing (Model(..))
-import Html exposing (Html)
 import Msg exposing (Msg)
 
 
@@ -13,8 +12,3 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     ( model, Cmd.none )
-
-
-view : Model -> Html Msg
-view model =
-    Html.text "Hello"
