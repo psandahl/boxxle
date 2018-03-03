@@ -1,8 +1,10 @@
-module Renderer.Renderer exposing (init, scene, setViewport)
+module Renderer.Renderer exposing (init, setViewport, viewScene)
 
 import Html exposing (Html)
+import Html.Attributes as Attr
 import Msg exposing (Msg)
 import Renderer.Model exposing (Model)
+import WebGL as GL
 import Window exposing (Size)
 
 
@@ -16,9 +18,17 @@ setViewport model size =
     { model | viewport = size }
 
 
-scene : Model -> Html Msg
-scene model =
-    Html.text <| "Viewport: " ++ toString model.viewport
+viewScene : Model -> Html Msg
+viewScene model =
+    GL.toHtmlWith
+        [ GL.antialias
+        , GL.depth 1
+        , GL.clearColor 0 0 1 0
+        ]
+        [ Attr.height model.viewport.height
+        , Attr.width model.viewport.width
+        ]
+        []
 
 
 defaultViewport : Size

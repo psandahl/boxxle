@@ -8,4 +8,4 @@ import Renderer.Renderer as Renderer
 
 view : Model -> Html Msg
 view model =
-    Renderer.scene model.renderer
+    Renderer.viewScene model.renderer
