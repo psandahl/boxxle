@@ -4,7 +4,8 @@ import Game.Model exposing (Model)
 import Game.Update exposing (init, update)
 import Game.View exposing (view)
 import Html
-import Msg exposing (Msg)
+import Msg exposing (Msg(..))
+import Window
 
 
 main : Program Never Model Msg
@@ -19,4 +20,4 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Window.resizes SetViewport

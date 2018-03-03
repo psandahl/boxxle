@@ -1,5 +1,7 @@
 module Msg exposing (Msg(..))
 
+import Window exposing (Size)
+
 
 type Msg
-    = Nop
+    = SetViewport Size

@@ -1,6 +1,5 @@
-module Renderer.Renderer exposing (init, scene)
+module Renderer.Renderer exposing (init, scene, setViewport)
 
-import Debug
 import Html exposing (Html)
 import Msg exposing (Msg)
 import Renderer.Model exposing (Model)
@@ -12,13 +11,14 @@ init =
     { viewport = defaultViewport }
 
 
+setViewport : Model -> Size -> Model
+setViewport model size =
+    { model | viewport = size }
+
+
 scene : Model -> Html Msg
 scene model =
-    let
-        d =
-            Debug.log "Viewport: " model.viewport
-    in
-    Html.text "Foo"
+    Html.text <| "Viewport: " ++ toString model.viewport
 
 
 defaultViewport : Size
