@@ -1,13 +1,19 @@
-module Renderer.Renderer exposing (init, setViewport, viewScene)
+module Renderer exposing (Model, init, setViewport, viewScene)
 
 import Html exposing (Html)
 import Html.Attributes as Attr
-import Math.Matrix4 as Linear
-import Math.Vector3 as Linear
+import Math.Matrix4 as Linear exposing (Mat4)
+import Math.Vector3 as Linear exposing (Vec3)
 import Msg exposing (Msg)
-import Renderer.Model exposing (Model)
 import WebGL as GL
 import Window exposing (Size)
+
+
+type alias Model =
+    { viewport : Size
+    , perspectiveMatrix : Mat4
+    , viewMatrix : Mat4
+    }
 
 
 init : Model

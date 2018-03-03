@@ -1,8 +1,8 @@
-module Game.Update exposing (init, update)
+module Orchestrator.Update exposing (init, update)
 
-import Game.Model exposing (Model)
 import Msg exposing (Msg(..))
-import Renderer.Renderer as Renderer
+import Orchestrator.Model exposing (Model)
+import Renderer
 import Task
 import Window
 

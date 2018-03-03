@@ -1,10 +1,10 @@
 module Main exposing (main)
 
-import Game.Model exposing (Model)
-import Game.Update exposing (init, update)
-import Game.View exposing (view)
 import Html
 import Msg exposing (Msg(..))
+import Orchestrator.Model exposing (Model)
+import Orchestrator.Update exposing (init, update)
+import Orchestrator.View exposing (view)
 import Window
 
 

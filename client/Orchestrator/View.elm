@@ -1,9 +1,9 @@
-module Game.View exposing (view)
+module Orchestrator.View exposing (view)
 
-import Game.Model exposing (Model)
 import Html exposing (Html)
 import Msg exposing (Msg)
-import Renderer.Renderer as Renderer
+import Orchestrator.Model exposing (Model)
+import Renderer
 
 
 view : Model -> Html Msg
