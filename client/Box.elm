@@ -154,8 +154,24 @@ fragmentShader =
     [glsl|
         precision mediump float;
 
+        vec3 lightColor = vec3(1.0);
+
+        vec3 fragColor();
+        vec3 ambientLight();
+
         void main()
         {
-            gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+            vec3 color = fragColor() * ambientLight();
+            gl_FragColor = vec4(color, 1.0);
+        }
+
+        vec3 fragColor()
+        {
+            return vec3(1.0, 0.0, 0.0);
+        }
+
+        vec3 ambientLight()
+        {
+            return lightColor * 0.2;
         }
     |]
