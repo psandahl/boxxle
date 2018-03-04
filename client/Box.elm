@@ -1,6 +1,7 @@
 module Box exposing (Box, makeBox, makeMesh, toEntity)
 
 import Math.Matrix4 as Linear exposing (Mat4)
+import Math.Vector2 exposing (Vec2, vec2)
 import Math.Vector3 exposing (Vec3, vec3)
 import WebGL as GL exposing (Entity, Mesh, Shader)
 import WebGL.Settings as Settings
@@ -15,6 +16,7 @@ type alias Box =
 type alias Vertex =
     { position : Vec3
     , normal : Vec3
+    , texCoord : Vec2
     }
 
 
@@ -30,85 +32,109 @@ makeMesh =
             [ -- Front side. First idx=0.
               { position = vec3 0.5 0.5 0.5
               , normal = front
+              , texCoord = vec2 1 1
               }
             , { position = vec3 -0.5 0.5 0.5
               , normal = front
+              , texCoord = vec2 0 1
               }
             , { position = vec3 -0.5 -0.5 0.5
               , normal = front
+              , texCoord = vec2 0 0
               }
             , { position = vec3 0.5 -0.5 0.5
               , normal = front
+              , texCoord = vec2 1 0
               }
 
             -- Right side. First idx=4.
             , { position = vec3 0.5 0.5 -0.5
               , normal = right
+              , texCoord = vec2 1 1
               }
             , { position = vec3 0.5 0.5 0.5
               , normal = right
+              , texCoord = vec2 0 1
               }
             , { position = vec3 0.5 -0.5 0.5
               , normal = right
+              , texCoord = vec2 0 0
               }
             , { position = vec3 0.5 -0.5 -0.5
               , normal = right
+              , texCoord = vec2 1 0
               }
 
             -- Left side. First idx=8.
             , { position = vec3 -0.5 0.5 0.5
               , normal = left
+              , texCoord = vec2 1 1
               }
             , { position = vec3 -0.5 0.5 -0.5
               , normal = left
+              , texCoord = vec2 0 1
               }
             , { position = vec3 -0.5 -0.5 -0.5
               , normal = left
+              , texCoord = vec2 0 0
               }
             , { position = vec3 -0.5 -0.5 0.5
               , normal = left
+              , texCoord = vec2 1 0
               }
 
             -- Back side. First idx=12.
             , { position = vec3 -0.5 0.5 -0.5
               , normal = back
+              , texCoord = vec2 1 1
               }
             , { position = vec3 0.5 0.5 -0.5
               , normal = back
+              , texCoord = vec2 0 1
               }
             , { position = vec3 0.5 -0.5 -0.5
               , normal = back
+              , texCoord = vec2 0 0
               }
             , { position = vec3 -0.5 -0.5 -0.5
               , normal = back
+              , texCoord = vec2 1 0
               }
 
             -- Bottom side. First idx=16.
             , { position = vec3 0.5 -0.5 0.5
               , normal = bottom
+              , texCoord = vec2 1 1
               }
             , { position = vec3 -0.5 -0.5 0.5
               , normal = bottom
+              , texCoord = vec2 0 1
               }
             , { position = vec3 -0.5 -0.5 -0.5
               , normal = bottom
+              , texCoord = vec2 0 0
               }
             , { position = vec3 0.5 -0.5 -0.5
               , normal = bottom
+              , texCoord = vec2 1 0
               }
 
             -- Top side. First idx=20.
             , { position = vec3 0.5 0.5 -0.5
               , normal = top
+              , texCoord = vec2 1 1
               }
             , { position = vec3 -0.5 0.5 -0.5
               , normal = top
+              , texCoord = vec2 0 1
               }
             , { position = vec3 -0.5 0.5 0.5
               , normal = top
+              , texCoord = vec2 0 0
               }
             , { position = vec3 0.5 0.5 0.5
               , normal = top
+              , texCoord = vec2 1 0
               }
             ]
 
@@ -198,6 +224,7 @@ vertexShader =
 
         attribute vec3 position;
         attribute vec3 normal;
+        attribute vec2 texCoord;
 
         uniform mat4 projectionMatrix;
         uniform mat4 viewMatrix;
