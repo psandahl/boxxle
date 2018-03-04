@@ -28,40 +28,88 @@ makeMesh =
     let
         vertices =
             [ -- Front side. First idx=0.
-              { position = vec3 0.5 0.5 0.5, normal = front }
-            , { position = vec3 -0.5 0.5 0.5, normal = front }
-            , { position = vec3 -0.5 -0.5 0.5, normal = front }
-            , { position = vec3 0.5 -0.5 0.5, normal = front }
+              { position = vec3 0.5 0.5 0.5
+              , normal = front
+              }
+            , { position = vec3 -0.5 0.5 0.5
+              , normal = front
+              }
+            , { position = vec3 -0.5 -0.5 0.5
+              , normal = front
+              }
+            , { position = vec3 0.5 -0.5 0.5
+              , normal = front
+              }
 
             -- Right side. First idx=4.
-            , { position = vec3 0.5 0.5 -0.5, normal = right }
-            , { position = vec3 0.5 0.5 0.5, normal = right }
-            , { position = vec3 0.5 -0.5 0.5, normal = right }
-            , { position = vec3 0.5 -0.5 -0.5, normal = right }
+            , { position = vec3 0.5 0.5 -0.5
+              , normal = right
+              }
+            , { position = vec3 0.5 0.5 0.5
+              , normal = right
+              }
+            , { position = vec3 0.5 -0.5 0.5
+              , normal = right
+              }
+            , { position = vec3 0.5 -0.5 -0.5
+              , normal = right
+              }
 
             -- Left side. First idx=8.
-            , { position = vec3 -0.5 0.5 0.5, normal = left }
-            , { position = vec3 -0.5 0.5 -0.5, normal = left }
-            , { position = vec3 -0.5 -0.5 -0.5, normal = left }
-            , { position = vec3 -0.5 -0.5 0.5, normal = left }
+            , { position = vec3 -0.5 0.5 0.5
+              , normal = left
+              }
+            , { position = vec3 -0.5 0.5 -0.5
+              , normal = left
+              }
+            , { position = vec3 -0.5 -0.5 -0.5
+              , normal = left
+              }
+            , { position = vec3 -0.5 -0.5 0.5
+              , normal = left
+              }
 
             -- Back side. First idx=12.
-            , { position = vec3 -0.5 0.5 -0.5, normal = back }
-            , { position = vec3 0.5 0.5 -0.5, normal = back }
-            , { position = vec3 0.5 -0.5 -0.5, normal = back }
-            , { position = vec3 -0.5 -0.5 -0.5, normal = back }
+            , { position = vec3 -0.5 0.5 -0.5
+              , normal = back
+              }
+            , { position = vec3 0.5 0.5 -0.5
+              , normal = back
+              }
+            , { position = vec3 0.5 -0.5 -0.5
+              , normal = back
+              }
+            , { position = vec3 -0.5 -0.5 -0.5
+              , normal = back
+              }
 
             -- Bottom side. First idx=16.
-            , { position = vec3 0.5 -0.5 0.5, normal = bottom }
-            , { position = vec3 -0.5 -0.5 0.5, normal = bottom }
-            , { position = vec3 -0.5 -0.5 -0.5, normal = bottom }
-            , { position = vec3 0.5 -0.5 -0.5, normal = bottom }
+            , { position = vec3 0.5 -0.5 0.5
+              , normal = bottom
+              }
+            , { position = vec3 -0.5 -0.5 0.5
+              , normal = bottom
+              }
+            , { position = vec3 -0.5 -0.5 -0.5
+              , normal = bottom
+              }
+            , { position = vec3 0.5 -0.5 -0.5
+              , normal = bottom
+              }
 
             -- Top side. First idx=20.
-            , { position = vec3 0.5 0.5 -0.5, normal = top }
-            , { position = vec3 -0.5 0.5 -0.5, normal = top }
-            , { position = vec3 -0.5 0.5 0.5, normal = top }
-            , { position = vec3 0.5 0.5 0.5, normal = top }
+            , { position = vec3 0.5 0.5 -0.5
+              , normal = top
+              }
+            , { position = vec3 -0.5 0.5 -0.5
+              , normal = top
+              }
+            , { position = vec3 -0.5 0.5 0.5
+              , normal = top
+              }
+            , { position = vec3 0.5 0.5 0.5
+              , normal = top
+              }
             ]
 
         indices =
