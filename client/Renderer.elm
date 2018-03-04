@@ -22,7 +22,7 @@ init =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
     , viewMatrix =
-        Linear.makeLookAt (Linear.vec3 0 10 10)
+        Linear.makeLookAt (Linear.vec3 10 10 10)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
     }
