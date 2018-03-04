@@ -100,7 +100,9 @@ toEntity projectionMatrix viewMatrix box =
         vertexShader
         fragmentShader
         box.mesh
-        { mvpMatrix = Linear.mul projectionMatrix <| Linear.mul viewMatrix box.modelMatrix
+        { projectionMatrix = projectionMatrix
+        , viewMatrix = viewMatrix
+        , modelMatrix = box.modelMatrix
         }
 
 
@@ -134,44 +136,77 @@ top =
     vec3 0 1 0
 
 
-vertexShader : Shader Vertex { uniforms | mvpMatrix : Mat4 } {}
+vertexShader :
+    Shader Vertex
+        { uniforms
+            | projectionMatrix : Mat4
+            , viewMatrix : Mat4
+            , modelMatrix : Mat4
+        }
+        { vNormal : Vec3 }
 vertexShader =
     [glsl|
+        precision mediump float;
+
         attribute vec3 position;
         attribute vec3 normal;
 
-        uniform mat4 mvpMatrix;
+        uniform mat4 projectionMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 modelMatrix;
+
+        varying vec3 vNormal;
 
         void main()
         {
+            mat4 vpMatrix = viewMatrix * modelMatrix;
+            vNormal = (vpMatrix * vec4(normal, 0.0)).xyz;
+
+            mat4 mvpMatrix = projectionMatrix * vpMatrix;
             gl_Position = mvpMatrix * vec4(position, 1.0);
         }
     |]
 
 
-fragmentShader : Shader {} uniforms {}
+fragmentShader : Shader {} { uniforms | viewMatrix : Mat4 } { vNormal : Vec3 }
 fragmentShader =
     [glsl|
         precision mediump float;
 
+        uniform mat4 viewMatrix;
+
+        varying vec3 vNormal;
+
+        vec3 lightDirection = normalize(vec3(1.0));
         vec3 lightColor = vec3(1.0);
 
         vec3 fragColor();
         vec3 ambientLight();
+        vec3 diffuseLight();
 
         void main()
         {
-            vec3 color = fragColor() * ambientLight();
+            vec3 color = fragColor() * (ambientLight() + diffuseLight());
             gl_FragColor = vec4(color, 1.0);
         }
 
         vec3 fragColor()
         {
-            return vec3(1.0, 0.0, 0.0);
+            return vec3(67.0 / 255.0, 70.0 / 255.0, 75.0 / 255.0);
         }
 
         vec3 ambientLight()
         {
-            return lightColor * 0.2;
+            return lightColor * 0.8;
+        }
+
+        vec3 diffuseLight()
+        {
+            vec3 normal = normalize(vNormal);
+            lightDirection = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
+
+            float diffuse = min(0.0, dot(normal, lightDirection));
+
+            return lightColor * diffuse;
         }
     |]
