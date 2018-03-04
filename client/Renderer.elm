@@ -1,5 +1,6 @@
 module Renderer exposing (Model, init, setViewport, viewScene)
 
+import Box exposing (Box)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Math.Matrix4 as Linear exposing (Mat4)
@@ -35,17 +36,18 @@ setViewport model size =
     }
 
 
-viewScene : Model -> Html Msg
-viewScene model =
+viewScene : Model -> List Box -> Html Msg
+viewScene model boxes =
     GL.toHtmlWith
         [ GL.antialias
         , GL.depth 1
-        , GL.clearColor 0 0 1 0
+        , GL.clearColor 0 0 0 0
         ]
         [ Attr.height model.viewport.height
         , Attr.width model.viewport.width
         ]
-        []
+    <|
+        List.map (Box.toEntity model.perspectiveMatrix model.viewMatrix) boxes
 
 
 defaultViewport : Size

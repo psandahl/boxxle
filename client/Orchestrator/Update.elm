@@ -1,5 +1,7 @@
 module Orchestrator.Update exposing (init, update)
 
+import Box
+import Math.Vector3 exposing (vec3)
 import Msg exposing (Msg(..))
 import Orchestrator.Model exposing (Model)
 import Renderer
@@ -9,7 +11,11 @@ import Window
 
 init : ( Model, Cmd Msg )
 init =
-    ( { renderer = Renderer.init }, Task.perform SetViewport Window.size )
+    ( { renderer = Renderer.init
+      , box = Box.makeBox Box.makeMesh <| vec3 0 0 0
+      }
+    , Task.perform SetViewport Window.size
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

@@ -8,4 +8,4 @@ import Renderer
 
 view : Model -> Html Msg
 view model =
-    Renderer.viewScene model.renderer
+    Renderer.viewScene model.renderer [ model.box ]
