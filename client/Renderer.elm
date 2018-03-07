@@ -1,4 +1,4 @@
-module Renderer exposing (Model, init, setViewport, viewScene)
+module Renderer exposing (Model, init, setTexture, setViewport, viewScene)
 
 import Box exposing (Box)
 import Html exposing (Html)
@@ -7,6 +7,7 @@ import Math.Matrix4 as Linear exposing (Mat4)
 import Math.Vector3 as Linear exposing (Vec3)
 import Msg exposing (Msg)
 import WebGL as GL
+import WebGL.Texture exposing (Texture)
 import Window exposing (Size)
 
 
@@ -14,6 +15,7 @@ type alias Model =
     { viewport : Size
     , perspectiveMatrix : Mat4
     , viewMatrix : Mat4
+    , texture : Maybe Texture
     }
 
 
@@ -25,6 +27,7 @@ init =
         Linear.makeLookAt (Linear.vec3 -4 10 10)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
+    , texture = Nothing
     }
 
 
@@ -34,6 +37,11 @@ setViewport model size =
         | viewport = size
         , perspectiveMatrix = perspectiveFromViewport size
     }
+
+
+setTexture : Model -> Texture -> Model
+setTexture model texture =
+    { model | texture = Just texture }
 
 
 viewScene : Model -> List Box -> Html Msg
@@ -47,7 +55,12 @@ viewScene model boxes =
         , Attr.width model.viewport.width
         ]
     <|
-        List.map (Box.toEntity model.perspectiveMatrix model.viewMatrix) boxes
+        case model.texture of
+            Just texture ->
+                List.map (Box.toEntity model.perspectiveMatrix model.viewMatrix texture) boxes
+
+            _ ->
+                []
 
 
 defaultViewport : Size

@@ -24,14 +24,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetViewport size ->
-            ( { model | renderer = Renderer.setViewport model.renderer size }, loadTextures )
+            ( { model
+                | renderer = Renderer.setViewport model.renderer size
+              }
+            , loadTextures
+            )
 
         SetTextures result ->
             case result of
-                Ok textures ->
-                    ( model, Cmd.none )
+                Ok [ texture ] ->
+                    ( { model
+                        | renderer = Renderer.setTexture model.renderer texture
+                      }
+                    , Cmd.none
+                    )
 
-                Err _ ->
+                _ ->
                     Debug.crash "Boom"
 
 

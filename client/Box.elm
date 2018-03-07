@@ -5,6 +5,7 @@ import Math.Vector2 exposing (Vec2, vec2)
 import Math.Vector3 exposing (Vec3, vec3)
 import WebGL as GL exposing (Entity, Mesh, Shader)
 import WebGL.Settings as Settings
+import WebGL.Texture exposing (Texture)
 
 
 type alias Box =
@@ -167,8 +168,8 @@ makeMesh =
     GL.indexedTriangles vertices indices
 
 
-toEntity : Mat4 -> Mat4 -> Box -> Entity
-toEntity projectionMatrix viewMatrix box =
+toEntity : Mat4 -> Mat4 -> Texture -> Box -> Entity
+toEntity projectionMatrix viewMatrix texture box =
     GL.entityWith
         [ Settings.cullFace Settings.back ]
         vertexShader
@@ -177,6 +178,7 @@ toEntity projectionMatrix viewMatrix box =
         { projectionMatrix = projectionMatrix
         , viewMatrix = viewMatrix
         , modelMatrix = box.modelMatrix
+        , dummyTexture = texture
         }
 
 
@@ -217,7 +219,7 @@ vertexShader :
             , viewMatrix : Mat4
             , modelMatrix : Mat4
         }
-        { vNormal : Vec3 }
+        { vNormal : Vec3, vTexCoord : Vec2 }
 vertexShader =
     [glsl|
         precision mediump float;
@@ -231,11 +233,14 @@ vertexShader =
         uniform mat4 modelMatrix;
 
         varying vec3 vNormal;
+        varying vec2 vTexCoord;
 
         void main()
         {
             mat4 vpMatrix = viewMatrix * modelMatrix;
             vNormal = (vpMatrix * vec4(normal, 0.0)).xyz;
+
+            vTexCoord = texCoord;
 
             mat4 mvpMatrix = projectionMatrix * vpMatrix;
             gl_Position = mvpMatrix * vec4(position, 1.0);
@@ -243,14 +248,22 @@ vertexShader =
     |]
 
 
-fragmentShader : Shader {} { uniforms | viewMatrix : Mat4 } { vNormal : Vec3 }
+fragmentShader :
+    Shader {}
+        { uniforms
+            | viewMatrix : Mat4
+            , dummyTexture : Texture
+        }
+        { vNormal : Vec3, vTexCoord : Vec2 }
 fragmentShader =
     [glsl|
         precision mediump float;
 
         uniform mat4 viewMatrix;
+        uniform sampler2D dummyTexture;
 
         varying vec3 vNormal;
+        varying vec2 vTexCoord;
 
         vec3 lightDirection = normalize(vec3(1.0));
         vec3 lightColor = vec3(1.0);
@@ -267,7 +280,7 @@ fragmentShader =
 
         vec3 fragColor()
         {
-            return vec3(67.0 / 255.0, 70.0 / 255.0, 75.0 / 255.0);
+            return texture2D(dummyTexture, vTexCoord).rgb;
         }
 
         vec3 ambientLight()
