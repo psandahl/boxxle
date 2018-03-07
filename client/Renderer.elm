@@ -1,4 +1,4 @@
-module Renderer exposing (Model, init, setTexture, setViewport, viewScene)
+module Renderer exposing (Renderer, init, setTexture, setViewport, viewScene)
 
 import Box exposing (Box)
 import Html exposing (Html)
@@ -11,7 +11,7 @@ import WebGL.Texture exposing (Texture)
 import Window exposing (Size)
 
 
-type alias Model =
+type alias Renderer =
     { viewport : Size
     , perspectiveMatrix : Mat4
     , viewMatrix : Mat4
@@ -19,7 +19,7 @@ type alias Model =
     }
 
 
-init : Model
+init : Renderer
 init =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
@@ -31,33 +31,33 @@ init =
     }
 
 
-setViewport : Model -> Size -> Model
-setViewport model size =
-    { model
+setViewport : Renderer -> Size -> Renderer
+setViewport renderer size =
+    { renderer
         | viewport = size
         , perspectiveMatrix = perspectiveFromViewport size
     }
 
 
-setTexture : Model -> Texture -> Model
-setTexture model texture =
-    { model | texture = Just texture }
+setTexture : Renderer -> Texture -> Renderer
+setTexture renderer texture =
+    { renderer | texture = Just texture }
 
 
-viewScene : Model -> List Box -> Html Msg
-viewScene model boxes =
+viewScene : Renderer -> List Box -> Html Msg
+viewScene renderer boxes =
     GL.toHtmlWith
         [ GL.antialias
         , GL.depth 1
         , GL.clearColor 0 0 0 0
         ]
-        [ Attr.height model.viewport.height
-        , Attr.width model.viewport.width
+        [ Attr.height renderer.viewport.height
+        , Attr.width renderer.viewport.width
         ]
     <|
-        case model.texture of
+        case renderer.texture of
             Just texture ->
-                List.map (Box.toEntity model.perspectiveMatrix model.viewMatrix texture) boxes
+                List.map (Box.toEntity renderer.perspectiveMatrix renderer.viewMatrix texture) boxes
 
             _ ->
                 []
