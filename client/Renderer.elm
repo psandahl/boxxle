@@ -50,7 +50,7 @@ viewScene renderer boxes =
         [ GL.antialias
         , GL.depth 1
         , GL.alpha False
-        , GL.clearColor 0 0 0 1
+        , GL.clearColor 1 1 1 1
         ]
         [ Attr.height renderer.viewport.height
         , Attr.width renderer.viewport.width
