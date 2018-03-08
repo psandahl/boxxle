@@ -19,6 +19,8 @@ type alias Box =
 type alias Vertex =
     { position : Vec3
     , normal : Vec3
+    , tangent : Vec3
+    , binormal : Vec3
     , texCoord : Vec2
     }
 
@@ -61,18 +63,26 @@ frontSide : List Vertex
 frontSide =
     [ { position = vec3 0.5 0.5 0.5
       , normal = front
+      , tangent = right
+      , binormal = up
       , texCoord = vec2 1 1
       }
     , { position = vec3 -0.5 0.5 0.5
       , normal = front
+      , tangent = right
+      , binormal = up
       , texCoord = vec2 0 1
       }
     , { position = vec3 -0.5 -0.5 0.5
       , normal = front
+      , tangent = right
+      , binormal = up
       , texCoord = vec2 0 0
       }
     , { position = vec3 0.5 -0.5 0.5
       , normal = front
+      , tangent = right
+      , binormal = up
       , texCoord = vec2 1 0
       }
     ]
@@ -117,6 +127,16 @@ front =
     vec3 0 0 1
 
 
+right : Vec3
+right =
+    vec3 1 0 0
+
+
+up : Vec3
+up =
+    vec3 0 1 0
+
+
 vertexShader :
     Shader Vertex
         { uniforms
@@ -124,13 +144,19 @@ vertexShader :
             , viewMatrix : Mat4
             , modelMatrix : Mat4
         }
-        { vNormal : Vec3, vTexCoord : Vec2 }
+        { vNormal : Vec3
+        , vTangent : Vec3
+        , vBinormal : Vec3
+        , vTexCoord : Vec2
+        }
 vertexShader =
     [glsl|
         precision mediump float;
 
         attribute vec3 position;
         attribute vec3 normal;
+        attribute vec3 tangent;
+        attribute vec3 binormal;
         attribute vec2 texCoord;
 
         uniform mat4 projectionMatrix;
@@ -138,13 +164,16 @@ vertexShader =
         uniform mat4 modelMatrix;
 
         varying vec3 vNormal;
+        varying vec3 vTangent;
+        varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
         void main()
         {
             mat4 vpMatrix = viewMatrix * modelMatrix;
             vNormal = (vpMatrix * vec4(normal, 0.0)).xyz;
-
+            vTangent = (vpMatrix * vec4(tangent, 0.0)).xyz;
+            vBinormal = (vpMatrix * vec4(binormal, 0.0)).xyz;
             vTexCoord = texCoord;
 
             mat4 mvpMatrix = projectionMatrix * vpMatrix;
@@ -159,7 +188,11 @@ fragmentShader :
             | viewMatrix : Mat4
             , dummyTexture : Texture
         }
-        { vNormal : Vec3, vTexCoord : Vec2 }
+        { vNormal : Vec3
+        , vTangent : Vec3
+        , vBinormal : Vec3
+        , vTexCoord : Vec2
+        }
 fragmentShader =
     [glsl|
         precision mediump float;
@@ -168,19 +201,29 @@ fragmentShader =
         uniform sampler2D dummyTexture;
 
         varying vec3 vNormal;
+        varying vec3 vTangent;
+        varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
         vec3 lightDirection = normalize(vec3(1.0));
         vec3 lightColor = vec3(1.0);
 
+        vec3 bumpedNormal();
         vec3 fragColor();
         vec3 ambientLight();
-        vec3 diffuseLight();
+        vec3 diffuseLight(vec3 normal);
 
         void main()
         {
-            vec3 color = fragColor() * (ambientLight() + diffuseLight());
+            vec3 normal = bumpedNormal();
+            vec3 color = fragColor() * (ambientLight() + diffuseLight(normal));
             gl_FragColor = vec4(color, 1.0);
+        }
+
+        vec3 bumpedNormal()
+        {
+            mat3 tbn = mat3(normalize(vTangent), normalize(vBinormal), normalize(vNormal));
+            return tbn * vec3(0.0, 0.0, 1.0);
         }
 
         vec3 fragColor()
@@ -193,9 +236,8 @@ fragmentShader =
             return lightColor * 0.8;
         }
 
-        vec3 diffuseLight()
+        vec3 diffuseLight(vec3 normal)
         {
-            vec3 normal = normalize(vNormal);
             lightDirection = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
 
             float diffuse = min(0.0, dot(normal, lightDirection));
