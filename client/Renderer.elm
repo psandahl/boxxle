@@ -1,4 +1,4 @@
-module Renderer exposing (Renderer, init, setTexture, setViewport, viewScene)
+module Renderer exposing (Renderer, init, setTextures, setViewport, viewScene)
 
 import Box exposing (Box)
 import Html exposing (Html)
@@ -15,7 +15,7 @@ type alias Renderer =
     { viewport : Size
     , perspectiveMatrix : Mat4
     , viewMatrix : Mat4
-    , texture : Maybe Texture
+    , textures : List Texture
     }
 
 
@@ -24,10 +24,10 @@ init =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
     , viewMatrix =
-        Linear.makeLookAt (Linear.vec3 -4 10 10)
+        Linear.makeLookAt (Linear.vec3 -3 3 3)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
-    , texture = Nothing
+    , textures = []
     }
 
 
@@ -39,9 +39,9 @@ setViewport renderer size =
     }
 
 
-setTexture : Renderer -> Texture -> Renderer
-setTexture renderer texture =
-    { renderer | texture = Just texture }
+setTextures : Renderer -> List Texture -> Renderer
+setTextures renderer textures =
+    { renderer | textures = textures }
 
 
 viewScene : Renderer -> List Box -> Html Msg
@@ -56,9 +56,9 @@ viewScene renderer boxes =
         , Attr.width renderer.viewport.width
         ]
     <|
-        case renderer.texture of
-            Just texture ->
-                List.map (Box.toEntity renderer.perspectiveMatrix renderer.viewMatrix texture) boxes
+        case renderer.textures of
+            [ texture, bumpmap ] ->
+                List.map (Box.toEntity renderer.perspectiveMatrix renderer.viewMatrix texture bumpmap) boxes
 
             _ ->
                 []

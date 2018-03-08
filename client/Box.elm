@@ -106,8 +106,8 @@ transformVertex mat vertex =
     }
 
 
-toEntity : Mat4 -> Mat4 -> Texture -> Box -> Entity
-toEntity projectionMatrix viewMatrix texture box =
+toEntity : Mat4 -> Mat4 -> Texture -> Texture -> Box -> Entity
+toEntity projectionMatrix viewMatrix texture bumpmap box =
     GL.entityWith
         [ DepthTest.default
         , Settings.cullFace Settings.back
@@ -119,6 +119,7 @@ toEntity projectionMatrix viewMatrix texture box =
         , viewMatrix = viewMatrix
         , modelMatrix = box.modelMatrix
         , dummyTexture = texture
+        , bumpmapTexture = bumpmap
         }
 
 
@@ -187,6 +188,7 @@ fragmentShader :
         { uniforms
             | viewMatrix : Mat4
             , dummyTexture : Texture
+            , bumpmapTexture : Texture
         }
         { vNormal : Vec3
         , vTangent : Vec3
@@ -199,13 +201,14 @@ fragmentShader =
 
         uniform mat4 viewMatrix;
         uniform sampler2D dummyTexture;
+        uniform sampler2D bumpmapTexture;
 
         varying vec3 vNormal;
         varying vec3 vTangent;
         varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
-        vec3 lightDirection = normalize(vec3(1.0));
+        vec3 lightDirection = normalize(vec3(1.0, -1.0, -1.0));
         vec3 lightColor = vec3(1.0);
 
         vec3 bumpedNormal();
@@ -222,8 +225,11 @@ fragmentShader =
 
         vec3 bumpedNormal()
         {
+            vec3 normal = texture2D(bumpmapTexture, vTexCoord).rgb;
+            normal = normal * 2.0 - vec3(1.0);
+
             mat3 tbn = mat3(normalize(vTangent), normalize(vBinormal), normalize(vNormal));
-            return tbn * vec3(0.0, 0.0, 1.0);
+            return normalize(tbn * normal);
         }
 
         vec3 fragColor()
@@ -233,7 +239,7 @@ fragmentShader =
 
         vec3 ambientLight()
         {
-            return lightColor * 0.8;
+            return lightColor * 0.6;
         }
 
         vec3 diffuseLight(vec3 normal)

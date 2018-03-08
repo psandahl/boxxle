@@ -32,9 +32,9 @@ update msg model =
 
         SetTextures result ->
             case result of
-                Ok [ texture ] ->
+                Ok [ texture, bumpmap ] ->
                     ( { model
-                        | renderer = Renderer.setTexture model.renderer texture
+                        | renderer = Renderer.setTextures model.renderer [ texture, bumpmap ]
                       }
                     , Cmd.none
                     )
@@ -48,4 +48,4 @@ loadTextures =
     Task.attempt SetTextures <|
         Task.sequence <|
             List.map Texture.load
-                [ "materials/dummy.png" ]
+                [ "materials/rock.jpg", "materials/rockbump.jpg" ]
