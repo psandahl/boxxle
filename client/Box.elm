@@ -1,10 +1,12 @@
 module Box exposing (Box, makeBox, makeMesh, toEntity)
 
+import Debug
 import Math.Matrix4 as Linear exposing (Mat4)
 import Math.Vector2 exposing (Vec2, vec2)
 import Math.Vector3 exposing (Vec3, vec3)
 import WebGL as GL exposing (Entity, Mesh, Shader)
 import WebGL.Settings as Settings
+import WebGL.Settings.DepthTest as DepthTest
 import WebGL.Texture exposing (Texture)
 
 
@@ -30,148 +32,76 @@ makeMesh : Mesh Vertex
 makeMesh =
     let
         vertices =
-            [ -- Front side. First idx=0.
-              { position = vec3 0.5 0.5 0.5
-              , normal = front
-              , texCoord = vec2 1 1
-              }
-            , { position = vec3 -0.5 0.5 0.5
-              , normal = front
-              , texCoord = vec2 0 1
-              }
-            , { position = vec3 -0.5 -0.5 0.5
-              , normal = front
-              , texCoord = vec2 0 0
-              }
-            , { position = vec3 0.5 -0.5 0.5
-              , normal = front
-              , texCoord = vec2 1 0
-              }
-
-            -- Right side. First idx=4.
-            , { position = vec3 0.5 0.5 -0.5
-              , normal = right
-              , texCoord = vec2 1 1
-              }
-            , { position = vec3 0.5 0.5 0.5
-              , normal = right
-              , texCoord = vec2 0 1
-              }
-            , { position = vec3 0.5 -0.5 0.5
-              , normal = right
-              , texCoord = vec2 0 0
-              }
-            , { position = vec3 0.5 -0.5 -0.5
-              , normal = right
-              , texCoord = vec2 1 0
-              }
-
-            -- Left side. First idx=8.
-            , { position = vec3 -0.5 0.5 0.5
-              , normal = left
-              , texCoord = vec2 1 1
-              }
-            , { position = vec3 -0.5 0.5 -0.5
-              , normal = left
-              , texCoord = vec2 0 1
-              }
-            , { position = vec3 -0.5 -0.5 -0.5
-              , normal = left
-              , texCoord = vec2 0 0
-              }
-            , { position = vec3 -0.5 -0.5 0.5
-              , normal = left
-              , texCoord = vec2 1 0
-              }
-
-            -- Back side. First idx=12.
-            , { position = vec3 -0.5 0.5 -0.5
-              , normal = back
-              , texCoord = vec2 1 1
-              }
-            , { position = vec3 0.5 0.5 -0.5
-              , normal = back
-              , texCoord = vec2 0 1
-              }
-            , { position = vec3 0.5 -0.5 -0.5
-              , normal = back
-              , texCoord = vec2 0 0
-              }
-            , { position = vec3 -0.5 -0.5 -0.5
-              , normal = back
-              , texCoord = vec2 1 0
-              }
-
-            -- Bottom side. First idx=16.
-            , { position = vec3 0.5 -0.5 0.5
-              , normal = bottom
-              , texCoord = vec2 1 1
-              }
-            , { position = vec3 -0.5 -0.5 0.5
-              , normal = bottom
-              , texCoord = vec2 0 1
-              }
-            , { position = vec3 -0.5 -0.5 -0.5
-              , normal = bottom
-              , texCoord = vec2 0 0
-              }
-            , { position = vec3 0.5 -0.5 -0.5
-              , normal = bottom
-              , texCoord = vec2 1 0
-              }
-
-            -- Top side. First idx=20.
-            , { position = vec3 0.5 0.5 -0.5
-              , normal = top
-              , texCoord = vec2 1 1
-              }
-            , { position = vec3 -0.5 0.5 -0.5
-              , normal = top
-              , texCoord = vec2 0 1
-              }
-            , { position = vec3 -0.5 0.5 0.5
-              , normal = top
-              , texCoord = vec2 0 0
-              }
-            , { position = vec3 0.5 0.5 0.5
-              , normal = top
-              , texCoord = vec2 1 0
-              }
-            ]
+            Debug.log "Vertices=" <|
+                List.concat <|
+                    List.map (transformSide frontSide)
+                        [ Linear.identity -- Front
+                        , Linear.makeRotate halfPi <| vec3 0 1 0 -- Right
+                        , Linear.makeRotate -halfPi <| vec3 0 1 0 -- Left
+                        , Linear.makeRotate halfPi <| vec3 1 0 0 -- Bottom
+                        , Linear.makeRotate -halfPi <| vec3 1 0 0 -- Top
+                        , Linear.makeRotate pi <| vec3 1 0 0 -- Back
+                        ]
 
         indices =
-            [ -- Front size.
-              ( 0, 1, 2 )
-            , ( 0, 2, 3 )
-
-            -- Right side.
-            , ( 4, 5, 6 )
-            , ( 4, 6, 7 )
-
-            -- Left side.
-            , ( 8, 9, 10 )
-            , ( 8, 10, 11 )
-
-            -- Back side.
-            , ( 12, 13, 14 )
-            , ( 12, 14, 15 )
-
-            -- Bottom side.
-            , ( 16, 17, 18 )
-            , ( 16, 18, 19 )
-
-            -- Top side.
-            , ( 20, 21, 22 )
-            , ( 20, 22, 23 )
-            ]
+            List.concat <|
+                List.map squareIndices [ 0, 4, 8, 12, 16, 20 ]
     in
     GL.indexedTriangles vertices indices
+
+
+squareIndices : Int -> List ( Int, Int, Int )
+squareIndices base =
+    [ ( base, base + 1, base + 2 )
+    , ( base, base + 2, base + 3 )
+    ]
+
+
+frontSide : List Vertex
+frontSide =
+    [ { position = vec3 0.5 0.5 0.5
+      , normal = front
+      , texCoord = vec2 1 1
+      }
+    , { position = vec3 -0.5 0.5 0.5
+      , normal = front
+      , texCoord = vec2 0 1
+      }
+    , { position = vec3 -0.5 -0.5 0.5
+      , normal = front
+      , texCoord = vec2 0 0
+      }
+    , { position = vec3 0.5 -0.5 0.5
+      , normal = front
+      , texCoord = vec2 1 0
+      }
+    ]
+
+
+halfPi : Float
+halfPi =
+    pi * 0.5
+
+
+transformSide : List Vertex -> Mat4 -> List Vertex
+transformSide vertices mat =
+    List.map (transformVertex mat) vertices
+
+
+transformVertex : Mat4 -> Vertex -> Vertex
+transformVertex mat vertex =
+    { vertex
+        | position = Linear.transform mat vertex.position
+        , normal = Linear.transform mat vertex.normal
+    }
 
 
 toEntity : Mat4 -> Mat4 -> Texture -> Box -> Entity
 toEntity projectionMatrix viewMatrix texture box =
     GL.entityWith
-        [ Settings.cullFace Settings.back ]
+        [ DepthTest.default
+        , Settings.cullFace Settings.back
+        ]
         vertexShader
         fragmentShader
         box.mesh
@@ -185,31 +115,6 @@ toEntity projectionMatrix viewMatrix texture box =
 front : Vec3
 front =
     vec3 0 0 1
-
-
-right : Vec3
-right =
-    vec3 1 0 0
-
-
-left : Vec3
-left =
-    vec3 -1 0 0
-
-
-back : Vec3
-back =
-    vec3 0 0 -1
-
-
-bottom : Vec3
-bottom =
-    vec3 0 -1 0
-
-
-top : Vec3
-top =
-    vec3 0 1 0
 
 
 vertexShader :

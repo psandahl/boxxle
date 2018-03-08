@@ -49,7 +49,8 @@ viewScene renderer boxes =
     GL.toHtmlWith
         [ GL.antialias
         , GL.depth 1
-        , GL.clearColor 0 0 0 0
+        , GL.alpha False
+        , GL.clearColor 0 0 0 1
         ]
         [ Attr.height renderer.viewport.height
         , Attr.width renderer.viewport.width
