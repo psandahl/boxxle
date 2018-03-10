@@ -208,7 +208,7 @@ fragmentShader =
         varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
-        vec3 lightDirection = normalize(vec3(1.0, -0.5, -1.0));
+        vec3 lightDirection = normalize(vec3(-2.0, 1.0, 1.0));
         vec3 lightColor = vec3(1.0);
 
         vec3 bumpedNormal();
@@ -234,20 +234,19 @@ fragmentShader =
 
         vec3 fragColor()
         {
-            //return texture2D(dummyTexture, vTexCoord).rgb;
-            return vec3(0.9, 0.9, 0.9);
+            return vec3(0.5, 0.5, 0.5);
         }
 
         vec3 ambientLight()
         {
-            return lightColor * 0.6;
+            return lightColor * 0.4;
         }
 
         vec3 diffuseLight(vec3 normal)
         {
             lightDirection = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
 
-            float diffuse = min(0.0, dot(normal, lightDirection));
+            float diffuse = max(0.0, dot(normal, lightDirection));
 
             return lightColor * diffuse;
         }

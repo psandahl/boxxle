@@ -24,7 +24,7 @@ init =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
     , viewMatrix =
-        Linear.makeLookAt (Linear.vec3 -0.2 2 2)
+        Linear.makeLookAt (Linear.vec3 -1 2 2)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
     , textures = []
@@ -50,7 +50,7 @@ viewScene renderer boxes =
         [ GL.antialias
         , GL.depth 1
         , GL.alpha False
-        , GL.clearColor 1 1 1 1
+        , GL.clearColor 0 0 0 1
         ]
         [ Attr.height renderer.viewport.height
         , Attr.width renderer.viewport.width
