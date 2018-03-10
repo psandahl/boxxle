@@ -107,7 +107,7 @@ transformVertex mat vertex =
 
 
 toEntity : Mat4 -> Mat4 -> Texture -> Texture -> Box -> Entity
-toEntity projectionMatrix viewMatrix texture bumpmap box =
+toEntity projectionMatrix viewMatrix normalMap specularMap box =
     GL.entityWith
         [ DepthTest.default
         , Settings.cullFace Settings.back
@@ -118,8 +118,8 @@ toEntity projectionMatrix viewMatrix texture bumpmap box =
         { projectionMatrix = projectionMatrix
         , viewMatrix = viewMatrix
         , modelMatrix = box.modelMatrix
-        , normalMap = bumpmap
-        , specularMap = texture
+        , normalMap = normalMap
+        , specularMap = specularMap
         }
 
 

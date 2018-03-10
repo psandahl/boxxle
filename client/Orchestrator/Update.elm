@@ -53,4 +53,4 @@ loadTextures =
     Task.attempt SetTextures <|
         Task.sequence <|
             List.map Texture.load
-                [ "materials/rock.jpg", "materials/NormalMap.png" ]
+                [ "materials/NormalMap.png", "materials/rockbump.jpg" ]
