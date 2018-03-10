@@ -214,7 +214,9 @@ fragmentShader =
         varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
-        vec3 lightDirection = normalize(vec3(-2.0, 1.0, 1.0));
+        vec3 lightDirection1 = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 lightDirection2 = normalize(vec3(-1.0, 1.0, 1.0));
+        vec3 lightDirection3 = normalize(vec3(0.0, 1.0, -1.0));
         vec3 lightColor = vec3(1.0);
 
         vec3 bumpedNormal();
@@ -226,11 +228,20 @@ fragmentShader =
         void main()
         {
             vec3 normal = bumpedNormal();
-            vec3 transformedLightDir = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
+            vec3 transformedLightDir1 = normalize((viewMatrix * vec4(lightDirection1, 0.0)).xyz);
+            vec3 transformedLightDir2 = normalize((viewMatrix * vec4(lightDirection2, 0.0)).xyz);
+            vec3 transformedLightDir3 = normalize((viewMatrix * vec4(lightDirection3, 0.0)).xyz);
+
+            vec3 diffuse = diffuseLight(normal, transformedLightDir1) +
+                diffuseLight(normal, transformedLightDir2) +
+                    diffuseLight(normal, transformedLightDir3);
+
+            vec3 specular = specularLight(normal, transformedLightDir1) +
+                specularLight(normal, transformedLightDir2) +
+                    specularLight(normal, transformedLightDir3);
+
             vec3 color = fragColor() *
-                (ambientLight() +
-                    diffuseLight(normal, transformedLightDir) +
-                        specularLight(normal, transformedLightDir));
+                (ambientLight() + diffuse / 3.0 + specular / 3.0);
             gl_FragColor = vec4(color, 1.0);
         }
 
@@ -250,7 +261,7 @@ fragmentShader =
 
         vec3 ambientLight()
         {
-            return lightColor * 0.4;
+            return lightColor * 0.3;
         }
 
         vec3 diffuseLight(vec3 normal, vec3 transformedLightDir)
@@ -264,7 +275,7 @@ fragmentShader =
         {
             vec3 reflectDir = reflect(-transformedLightDir, normal);
             vec3 viewDir = normalize(vec3(0.0) - vPosition);
-            float specular = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+            float specular = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
 
             float shine = texture2D(specularMap, vTexCoord).r;
 

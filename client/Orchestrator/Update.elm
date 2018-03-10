@@ -14,7 +14,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { state = Initializing
       , renderer = Nothing
-      , box = Box.makeBox Box.makeMesh <| vec3 0 0 0
+      , box = Box.makeBox Box.makeMesh <| vec3 1 0 0
       }
       -- Order the task of loading textures from the server.
     , loadTextures
