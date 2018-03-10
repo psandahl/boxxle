@@ -145,7 +145,8 @@ vertexShader :
             , viewMatrix : Mat4
             , modelMatrix : Mat4
         }
-        { vNormal : Vec3
+        { vPosition : Vec3
+        , vNormal : Vec3
         , vTangent : Vec3
         , vBinormal : Vec3
         , vTexCoord : Vec2
@@ -164,6 +165,7 @@ vertexShader =
         uniform mat4 viewMatrix;
         uniform mat4 modelMatrix;
 
+        varying vec3 vPosition;
         varying vec3 vNormal;
         varying vec3 vTangent;
         varying vec3 vBinormal;
@@ -171,13 +173,15 @@ vertexShader =
 
         void main()
         {
-            mat4 vpMatrix = viewMatrix * modelMatrix;
-            vNormal = (vpMatrix * vec4(normal, 0.0)).xyz;
-            vTangent = (vpMatrix * vec4(tangent, 0.0)).xyz;
-            vBinormal = (vpMatrix * vec4(binormal, 0.0)).xyz;
+            mat4 mvMatrix = viewMatrix * modelMatrix;
+
+            vPosition = (mvMatrix * vec4(position, 1.0)).xyz;
+            vNormal = (mvMatrix * vec4(normal, 0.0)).xyz;
+            vTangent = (mvMatrix * vec4(tangent, 0.0)).xyz;
+            vBinormal = (mvMatrix * vec4(binormal, 0.0)).xyz;
             vTexCoord = texCoord;
 
-            mat4 mvpMatrix = projectionMatrix * vpMatrix;
+            mat4 mvpMatrix = projectionMatrix * mvMatrix;
             gl_Position = mvpMatrix * vec4(position, 1.0);
         }
     |]
@@ -190,7 +194,8 @@ fragmentShader :
             , normalMap : Texture
             , specularMap : Texture
         }
-        { vNormal : Vec3
+        { vPosition : Vec3
+        , vNormal : Vec3
         , vTangent : Vec3
         , vBinormal : Vec3
         , vTexCoord : Vec2
@@ -203,6 +208,7 @@ fragmentShader =
         uniform sampler2D normalMap;
         uniform sampler2D specularMap;
 
+        varying vec3 vPosition;
         varying vec3 vNormal;
         varying vec3 vTangent;
         varying vec3 vBinormal;
@@ -215,12 +221,16 @@ fragmentShader =
         vec3 fragColor();
         vec3 ambientLight();
         vec3 diffuseLight(vec3 normal, vec3 transformedLightDir);
+        vec3 specularLight(vec3 normal, vec3 transformedLightDir);
 
         void main()
         {
             vec3 normal = bumpedNormal();
             vec3 transformedLightDir = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
-            vec3 color = fragColor() * (ambientLight() + diffuseLight(normal, transformedLightDir));
+            vec3 color = fragColor() *
+                (ambientLight() +
+                    diffuseLight(normal, transformedLightDir) +
+                        specularLight(normal, transformedLightDir));
             gl_FragColor = vec4(color, 1.0);
         }
 
@@ -248,5 +258,16 @@ fragmentShader =
             float diffuse = max(0.0, dot(normal, transformedLightDir));
 
             return lightColor * diffuse;
+        }
+
+        vec3 specularLight(vec3 normal, vec3 transformedLightDir)
+        {
+            vec3 reflectDir = reflect(-transformedLightDir, normal);
+            vec3 viewDir = normalize(vec3(0.0) - vPosition);
+            float specular = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+
+            float shine = texture2D(specularMap, vTexCoord).r;
+
+            return lightColor * specular * shine;
         }
     |]
