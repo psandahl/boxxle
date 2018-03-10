@@ -25,7 +25,7 @@ init normalMap specularMap =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
     , viewMatrix =
-        Linear.makeLookAt (Linear.vec3 0 10 10)
+        Linear.makeLookAt (Linear.vec3 0 4 4)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
     , normalMap = normalMap

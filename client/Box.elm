@@ -256,7 +256,7 @@ fragmentShader =
 
         vec3 fragColor()
         {
-            return vec3(0.5, 0.5, 0.5);
+            return vec3(0.91, 0.91, 0.91);
         }
 
         vec3 ambientLight()
