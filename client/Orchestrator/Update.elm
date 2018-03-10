@@ -1,10 +1,9 @@
 module Orchestrator.Update exposing (init, update)
 
 import Box
-import Debug
 import Math.Vector3 exposing (vec3)
 import Msg exposing (Msg(..))
-import Orchestrator.Model exposing (Model)
+import Orchestrator.Model exposing (Model, State(..))
 import Renderer
 import Task
 import WebGL.Texture as Texture
@@ -13,10 +12,12 @@ import Window
 
 init : ( Model, Cmd Msg )
 init =
-    ( { renderer = Renderer.init
+    ( { state = Initializing
+      , renderer = Nothing
       , box = Box.makeBox Box.makeMesh <| vec3 0 0 0
       }
-    , Task.perform SetViewport Window.size
+      -- Order the task of loading textures from the server.
+    , loadTextures
     )
 
 
@@ -25,22 +26,26 @@ update msg model =
     case msg of
         SetViewport size ->
             ( { model
-                | renderer = Renderer.setViewport model.renderer size
+                | renderer = Maybe.map (Renderer.setViewport size) model.renderer
               }
-            , loadTextures
+            , Cmd.none
             )
 
         SetTextures result ->
             case result of
-                Ok [ texture, bumpmap ] ->
+                Ok [ normalMap, specularMap ] ->
                     ( { model
-                        | renderer = Renderer.setTextures model.renderer [ texture, bumpmap ]
+                        | state = Initialized
+                        , renderer = Just <| Renderer.init normalMap specularMap
                       }
-                    , Cmd.none
+                    , Task.perform SetViewport Window.size
                     )
 
+                Ok _ ->
+                    ( { model | state = Error "Unexpected number of textures from server" }, Cmd.none )
+
                 _ ->
-                    Debug.crash "Boom"
+                    ( { model | state = Error "Communication error with server" }, Cmd.none )
 
 
 loadTextures : Cmd Msg

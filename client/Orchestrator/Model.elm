@@ -1,10 +1,17 @@
-module Orchestrator.Model exposing (Model)
+module Orchestrator.Model exposing (Model, State(..))
 
 import Box exposing (Box)
 import Renderer exposing (Renderer)
 
 
+type State
+    = Initializing
+    | Initialized
+    | Error String
+
+
 type alias Model =
-    { renderer : Renderer
+    { state : State
+    , renderer : Maybe Renderer
     , box : Box
     }
