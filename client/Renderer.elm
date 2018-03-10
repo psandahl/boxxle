@@ -24,7 +24,7 @@ init =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
     , viewMatrix =
-        Linear.makeLookAt (Linear.vec3 -3 3 3)
+        Linear.makeLookAt (Linear.vec3 -0.2 2 2)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
     , textures = []
