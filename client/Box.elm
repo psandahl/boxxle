@@ -118,8 +118,8 @@ toEntity projectionMatrix viewMatrix texture bumpmap box =
         { projectionMatrix = projectionMatrix
         , viewMatrix = viewMatrix
         , modelMatrix = box.modelMatrix
-        , dummyTexture = texture
-        , bumpmapTexture = bumpmap
+        , normalMap = bumpmap
+        , specularMap = texture
         }
 
 
@@ -187,8 +187,8 @@ fragmentShader :
     Shader {}
         { uniforms
             | viewMatrix : Mat4
-            , dummyTexture : Texture
-            , bumpmapTexture : Texture
+            , normalMap : Texture
+            , specularMap : Texture
         }
         { vNormal : Vec3
         , vTangent : Vec3
@@ -200,32 +200,34 @@ fragmentShader =
         precision mediump float;
 
         uniform mat4 viewMatrix;
-        uniform sampler2D dummyTexture;
-        uniform sampler2D bumpmapTexture;
+        uniform sampler2D normalMap;
+        uniform sampler2D specularMap;
 
         varying vec3 vNormal;
         varying vec3 vTangent;
         varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
+        // Todo: A transformed light direction from CPU.
         vec3 lightDirection = normalize(vec3(-2.0, 1.0, 1.0));
         vec3 lightColor = vec3(1.0);
 
         vec3 bumpedNormal();
         vec3 fragColor();
         vec3 ambientLight();
-        vec3 diffuseLight(vec3 normal);
+        vec3 diffuseLight(vec3 normal, vec3 transformedLightDir);
 
         void main()
         {
             vec3 normal = bumpedNormal();
-            vec3 color = fragColor() * (ambientLight() + diffuseLight(normal));
+            vec3 transformedLightDir = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
+            vec3 color = fragColor() * (ambientLight() + diffuseLight(normal, transformedLightDir));
             gl_FragColor = vec4(color, 1.0);
         }
 
         vec3 bumpedNormal()
         {
-            vec3 normal = texture2D(bumpmapTexture, vTexCoord).rgb;
+            vec3 normal = texture2D(normalMap, vTexCoord).rgb;
             normal = normal * 2.0 - vec3(1.0);
 
             mat3 tbn = mat3(normalize(vTangent), normalize(vBinormal), normalize(vNormal));
@@ -242,11 +244,9 @@ fragmentShader =
             return lightColor * 0.4;
         }
 
-        vec3 diffuseLight(vec3 normal)
+        vec3 diffuseLight(vec3 normal, vec3 transformedLightDir)
         {
-            lightDirection = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz);
-
-            float diffuse = max(0.0, dot(normal, lightDirection));
+            float diffuse = max(0.0, dot(normal, transformedLightDir));
 
             return lightColor * diffuse;
         }
