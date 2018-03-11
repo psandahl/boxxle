@@ -214,9 +214,15 @@ fragmentShader =
         varying vec3 vBinormal;
         varying vec2 vTexCoord;
 
-        vec3 lightDirection1 = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 lightDirection2 = normalize(vec3(-1.0, 1.0, 1.0));
-        vec3 lightDirection3 = normalize(vec3(0.0, 1.0, -1.0));
+        // From right behind.
+        vec3 light1 = normalize(vec3(1.0, 1.0, 1.0));
+        // From left behind.
+        vec3 light2 = normalize(vec3(-1.0, 1.0, 1.0));
+        // From above and in front.
+        vec3 light3 = normalize(vec3(0.0, 1.0, -1.0));
+        // From back and below.
+        vec3 light4 = normalize(vec3(0.0, -1.0, 1.0));
+
         vec3 lightColor = vec3(1.0);
 
         vec3 bumpedNormal();
@@ -228,20 +234,24 @@ fragmentShader =
         void main()
         {
             vec3 normal = bumpedNormal();
-            vec3 transformedLightDir1 = normalize((viewMatrix * vec4(lightDirection1, 0.0)).xyz);
-            vec3 transformedLightDir2 = normalize((viewMatrix * vec4(lightDirection2, 0.0)).xyz);
-            vec3 transformedLightDir3 = normalize((viewMatrix * vec4(lightDirection3, 0.0)).xyz);
+            vec3 transformedLight1 = normalize((viewMatrix * vec4(light1, 0.0)).xyz);
+            vec3 transformedLight2 = normalize((viewMatrix * vec4(light2, 0.0)).xyz);
+            vec3 transformedLight3 = normalize((viewMatrix * vec4(light3, 0.0)).xyz);
+            vec3 transformedLight4 = normalize((viewMatrix * vec4(light4, 0.0)).xyz);
 
-            vec3 diffuse = diffuseLight(normal, transformedLightDir1) +
-                diffuseLight(normal, transformedLightDir2) +
-                    diffuseLight(normal, transformedLightDir3);
+            vec3 diffuse = diffuseLight(normal, transformedLight1) +
+                diffuseLight(normal, transformedLight2) +
+                    diffuseLight(normal, transformedLight3) +
+                        diffuseLight(normal, transformedLight4);
 
-            vec3 specular = specularLight(normal, transformedLightDir1) +
-                specularLight(normal, transformedLightDir2) +
-                    specularLight(normal, transformedLightDir3);
+            vec3 specular = specularLight(normal, transformedLight1) +
+                specularLight(normal, transformedLight2) +
+                    specularLight(normal, transformedLight3) +
+                        specularLight(normal, transformedLight4);
 
             vec3 color = fragColor() *
-                (ambientLight() + diffuse / 3.0 + specular / 3.0);
+                (ambientLight() + diffuse / 4.0 + specular / 4.0);
+
             gl_FragColor = vec4(color, 1.0);
         }
 
