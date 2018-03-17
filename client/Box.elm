@@ -34,22 +34,17 @@ makeMesh : Mesh Vertex
 makeMesh =
     let
         vertices =
-            Debug.log "Vertices=" <|
-                List.concat <|
-                    List.map (transformSide frontSide)
-                        [ Linear.identity -- Front
-                        , Linear.makeRotate halfPi <| vec3 0 1 0 -- Right
-                        , Linear.makeRotate -halfPi <| vec3 0 1 0 -- Left
-                        , Linear.makeRotate halfPi <| vec3 1 0 0 -- Bottom
-                        , Linear.makeRotate -halfPi <| vec3 1 0 0 -- Top
-                        , Linear.makeRotate pi <| vec3 1 0 0 -- Back
-                        ]
+            List.concat [ frontSide, backSide, rightSide, leftSide, bottomSide, topSide ]
 
         indices =
             List.concat <|
                 List.map squareIndices [ 0, 4, 8, 12, 16, 20 ]
     in
     GL.indexedTriangles vertices indices
+
+
+
+{- Generate indices for a square starting with the given vertex index. -}
 
 
 squareIndices : Int -> List ( Int, Int, Int )
@@ -61,29 +56,73 @@ squareIndices base =
 
 frontSide : List Vertex
 frontSide =
+    transformSide (side horizontalTexture) Linear.identity
+
+
+backSide : List Vertex
+backSide =
+    transformSide (side verticalTexture) <|
+        Linear.makeRotate pi <|
+            vec3 1 0 0
+
+
+rightSide : List Vertex
+rightSide =
+    transformSide (side rightTexture) <|
+        Linear.makeRotate halfPi <|
+            vec3 0 1 0
+
+
+leftSide : List Vertex
+leftSide =
+    transformSide (side leftTexture) <|
+        Linear.makeRotate -halfPi <|
+            vec3 0 1 0
+
+
+bottomSide : List Vertex
+bottomSide =
+    transformSide (side switchTexture) <|
+        Linear.makeRotate halfPi <|
+            vec3 1 0 0
+
+
+topSide : List Vertex
+topSide =
+    transformSide (side blankTexture) <|
+        Linear.makeRotate -halfPi <|
+            vec3 1 0 0
+
+
+
+{- The template side is facing forward, i.e. point towards positive Z. -}
+
+
+side : ( Vec2, Vec2, Vec2, Vec2 ) -> List Vertex
+side ( ll, lr, ul, ur ) =
     [ { position = vec3 0.5 0.5 0.5
       , normal = front
       , tangent = right
       , binormal = up
-      , texCoord = vec2 1 1
+      , texCoord = ur
       }
     , { position = vec3 -0.5 0.5 0.5
       , normal = front
       , tangent = right
       , binormal = up
-      , texCoord = vec2 0 1
+      , texCoord = ul
       }
     , { position = vec3 -0.5 -0.5 0.5
       , normal = front
       , tangent = right
       , binormal = up
-      , texCoord = vec2 0 0
+      , texCoord = ll
       }
     , { position = vec3 0.5 -0.5 0.5
       , normal = front
       , tangent = right
       , binormal = up
-      , texCoord = vec2 1 0
+      , texCoord = lr
       }
     ]
 
@@ -136,6 +175,36 @@ right =
 up : Vec3
 up =
     vec3 0 1 0
+
+
+blankTexture : ( Vec2, Vec2, Vec2, Vec2 )
+blankTexture =
+    ( vec2 0 0.75, vec2 0.5 0.75, vec2 0 1, vec2 0.5 1 )
+
+
+horizontalTexture : ( Vec2, Vec2, Vec2, Vec2 )
+horizontalTexture =
+    ( vec2 0.5 0.75, vec2 1 0.75, vec2 0.5 1, vec2 1 1 )
+
+
+leftTexture : ( Vec2, Vec2, Vec2, Vec2 )
+leftTexture =
+    ( vec2 0 0.5, vec2 0.5 0.5, vec2 0 0.75, vec2 0.5 0.75 )
+
+
+rightTexture : ( Vec2, Vec2, Vec2, Vec2 )
+rightTexture =
+    ( vec2 0.5 0.5, vec2 1 0.5, vec2 0.5 0.75, vec2 1 0.75 )
+
+
+switchTexture : ( Vec2, Vec2, Vec2, Vec2 )
+switchTexture =
+    ( vec2 0 0.25, vec2 0.5 0.25, vec2 0 0.5, vec2 0.5 0.5 )
+
+
+verticalTexture : ( Vec2, Vec2, Vec2, Vec2 )
+verticalTexture =
+    ( vec2 0.5 0.25, vec2 1 0.25, vec2 0.5 0.5, vec2 1 0.5 )
 
 
 vertexShader :

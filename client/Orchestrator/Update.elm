@@ -53,6 +53,6 @@ loadTextures =
     Task.attempt SetTextures <|
         Task.sequence <|
             List.map Texture.load
-                [ "materials/switch-normal.png"
-                , "materials/switch-specular.png"
+                [ "materials/normal-atlas.png"
+                , "materials/specular-atlas.png"
                 ]
