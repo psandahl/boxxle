@@ -1,10 +1,10 @@
 module Main exposing (main)
 
 import Html
+import Model exposing (Model)
 import Msg exposing (Msg(..))
-import Orchestrator.Model exposing (Model)
-import Orchestrator.Update exposing (init, update)
-import Orchestrator.View exposing (view)
+import Update exposing (init, update)
+import View exposing (view)
 import Window
 
 

@@ -1,4 +1,4 @@
-module Orchestrator.Model exposing (Model, State(..))
+module Model exposing (Model, State(..))
 
 import Box exposing (Box)
 import Renderer exposing (Renderer)

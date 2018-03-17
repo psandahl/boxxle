@@ -1,9 +1,9 @@
-module Orchestrator.View exposing (view)
+module View exposing (view)
 
 import Debug
 import Html exposing (Html)
+import Model exposing (Model, State(..))
 import Msg exposing (Msg)
-import Orchestrator.Model exposing (Model, State(..))
 import Renderer
 
 

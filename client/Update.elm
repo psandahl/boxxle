@@ -1,9 +1,9 @@
-module Orchestrator.Update exposing (init, update)
+module Update exposing (init, update)
 
 import Box
 import Math.Vector3 exposing (vec3)
+import Model exposing (Model, State(..))
 import Msg exposing (Msg(..))
-import Orchestrator.Model exposing (Model, State(..))
 import Renderer
 import Task
 import WebGL.Texture as Texture
