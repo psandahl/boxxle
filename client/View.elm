@@ -1,6 +1,7 @@
 module View exposing (view)
 
 import Debug
+import Game
 import Html exposing (Html)
 import Model exposing (Model, State(..))
 import Msg exposing (Msg)
@@ -14,12 +15,12 @@ view model =
             Html.text "Initializing ..."
 
         Initialized ->
-            case model.renderer of
-                Just renderer ->
-                    Renderer.viewScene renderer [ model.box ]
+            case model.game of
+                Just game ->
+                    Renderer.viewScene model.renderer <| Game.boxes game
 
                 _ ->
-                    Debug.crash "No renderer!"
+                    Debug.crash "No game although Initialized state"
 
         Error str ->
             Html.text <| "Error: " ++ str

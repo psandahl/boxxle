@@ -1,6 +1,7 @@
 module Update exposing (init, update)
 
 import Box
+import Game
 import Math.Vector3 exposing (vec3)
 import Model exposing (Model, State(..))
 import Msg exposing (Msg(..))
@@ -13,11 +14,11 @@ import Window
 init : ( Model, Cmd Msg )
 init =
     ( { state = Initializing
-      , renderer = Nothing
-      , box = Box.makeBox Box.makeMesh <| vec3 1 0 0
+      , renderer = Renderer.init
+      , game = Nothing
       }
       -- Order the task of loading textures from the server.
-    , loadTextures
+    , Cmd.batch [ Task.perform SetViewport Window.size, loadTextures ]
     )
 
 
@@ -26,7 +27,7 @@ update msg model =
     case msg of
         SetViewport size ->
             ( { model
-                | renderer = Maybe.map (Renderer.setViewport size) model.renderer
+                | renderer = Renderer.setViewport size model.renderer
               }
             , Cmd.none
             )
@@ -36,9 +37,9 @@ update msg model =
                 Ok [ normalMap, specularMap ] ->
                     ( { model
                         | state = Initialized
-                        , renderer = Just <| Renderer.init normalMap specularMap
+                        , game = Just <| Game.init Box.makeMesh normalMap specularMap
                       }
-                    , Task.perform SetViewport Window.size
+                    , Cmd.none
                     )
 
                 Ok _ ->

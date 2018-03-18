@@ -1,4 +1,4 @@
-module Box exposing (Box, makeBox, makeMesh, toEntity)
+module Box exposing (Box, Vertex, init, makeMesh, toEntity)
 
 import Debug
 import Math.Matrix4 as Linear exposing (Mat4)
@@ -12,6 +12,8 @@ import WebGL.Texture exposing (Texture)
 
 type alias Box =
     { mesh : Mesh Vertex
+    , normalMap : Texture
+    , specularMap : Texture
     , modelMatrix : Mat4
     }
 
@@ -25,9 +27,13 @@ type alias Vertex =
     }
 
 
-makeBox : Mesh Vertex -> Vec3 -> Box
-makeBox mesh origin =
-    { mesh = mesh, modelMatrix = Linear.makeTranslate origin }
+init : Mesh Vertex -> Texture -> Texture -> Vec3 -> Box
+init mesh normalMap specularMap origin =
+    { mesh = mesh
+    , normalMap = normalMap
+    , specularMap = specularMap
+    , modelMatrix = Linear.makeTranslate origin
+    }
 
 
 makeMesh : Mesh Vertex
@@ -145,8 +151,8 @@ transformVertex mat vertex =
     }
 
 
-toEntity : Mat4 -> Mat4 -> Texture -> Texture -> Box -> Entity
-toEntity projectionMatrix viewMatrix normalMap specularMap box =
+toEntity : Mat4 -> Mat4 -> Box -> Entity
+toEntity projectionMatrix viewMatrix box =
     GL.entityWith
         [ DepthTest.default
         , Settings.cullFace Settings.back
@@ -157,8 +163,8 @@ toEntity projectionMatrix viewMatrix normalMap specularMap box =
         { projectionMatrix = projectionMatrix
         , viewMatrix = viewMatrix
         , modelMatrix = box.modelMatrix
-        , normalMap = normalMap
-        , specularMap = specularMap
+        , normalMap = box.normalMap
+        , specularMap = box.specularMap
         }
 
 

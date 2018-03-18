@@ -1,6 +1,6 @@
 module Model exposing (Model, State(..))
 
-import Box exposing (Box)
+import Game exposing (Game)
 import Renderer exposing (Renderer)
 
 
@@ -12,6 +12,6 @@ type State
 
 type alias Model =
     { state : State
-    , renderer : Maybe Renderer
-    , box : Box
+    , renderer : Renderer
+    , game : Maybe Game
     }

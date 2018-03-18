@@ -7,7 +7,6 @@ import Math.Matrix4 as Linear exposing (Mat4)
 import Math.Vector3 as Linear exposing (Vec3)
 import Msg exposing (Msg)
 import WebGL as GL
-import WebGL.Texture exposing (Texture)
 import Window exposing (Size)
 
 
@@ -15,21 +14,17 @@ type alias Renderer =
     { viewport : Size
     , perspectiveMatrix : Mat4
     , viewMatrix : Mat4
-    , normalMap : Texture
-    , specularMap : Texture
     }
 
 
-init : Texture -> Texture -> Renderer
-init normalMap specularMap =
+init : Renderer
+init =
     { viewport = defaultViewport
     , perspectiveMatrix = perspectiveFromViewport defaultViewport
     , viewMatrix =
         Linear.makeLookAt (Linear.vec3 -2 4 4)
             (Linear.vec3 0 0 0)
             (Linear.vec3 0 1 0)
-    , normalMap = normalMap
-    , specularMap = specularMap
     }
 
 
@@ -56,8 +51,6 @@ viewScene renderer boxes =
         List.map
             (Box.toEntity renderer.perspectiveMatrix
                 renderer.viewMatrix
-                renderer.normalMap
-                renderer.specularMap
             )
             boxes
 
