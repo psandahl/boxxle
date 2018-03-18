@@ -4,10 +4,17 @@ import Game exposing (Game)
 import Renderer exposing (Renderer)
 
 
+{- Game states -}
+
+
 type State
     = Initializing
     | Initialized
     | Error String
+
+
+
+{- Main model of the Boxxle game -}
 
 
 type alias Model =

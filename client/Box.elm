@@ -10,12 +10,19 @@ import WebGL.Settings.DepthTest as DepthTest
 import WebGL.Texture exposing (Texture)
 
 
+{- Box record. -}
+
+
 type alias Box =
     { mesh : Mesh Vertex
     , normalMap : Texture
     , specularMap : Texture
     , modelMatrix : Mat4
     }
+
+
+
+{- Box vertex attributes. -}
 
 
 type alias Vertex =
@@ -27,6 +34,10 @@ type alias Vertex =
     }
 
 
+
+{- Init a new box. -}
+
+
 init : Mesh Vertex -> Texture -> Texture -> Vec3 -> Box
 init mesh normalMap specularMap origin =
     { mesh = mesh
@@ -34,6 +45,10 @@ init mesh normalMap specularMap origin =
     , specularMap = specularMap
     , modelMatrix = Linear.makeTranslate origin
     }
+
+
+
+{- Make a box mesh. -}
 
 
 makeMesh : Mesh Vertex

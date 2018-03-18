@@ -10,11 +10,18 @@ import WebGL as GL
 import Window exposing (Size)
 
 
+{- Renderer record. Holding information for rendering. -}
+
+
 type alias Renderer =
     { viewport : Size
     , perspectiveMatrix : Mat4
     , viewMatrix : Mat4
     }
+
+
+
+{- Initialize a renderer with a default viewport. -}
 
 
 init : Renderer
@@ -28,12 +35,20 @@ init =
     }
 
 
+
+{- Set a new viewport and recalculate the perspecitive matrix. -}
+
+
 setViewport : Size -> Renderer -> Renderer
 setViewport size renderer =
     { renderer
         | viewport = size
         , perspectiveMatrix = perspectiveFromViewport size
     }
+
+
+
+{- View a scene of Boxes. -}
 
 
 viewScene : Renderer -> List Box -> Html Msg

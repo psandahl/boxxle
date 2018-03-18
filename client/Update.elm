@@ -11,15 +11,22 @@ import WebGL.Texture as Texture
 import Window
 
 
+{- Initialize the main model. -}
+
+
 init : ( Model, Cmd Msg )
 init =
     ( { state = Initializing
       , renderer = Renderer.init
       , game = Nothing
       }
-      -- Order the task of loading textures from the server.
+      -- Order a new viewport and load textures from server.
     , Cmd.batch [ Task.perform SetViewport Window.size, loadTextures ]
     )
+
+
+
+{- Handle messages. -}
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
