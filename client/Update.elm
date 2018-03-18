@@ -1,6 +1,7 @@
 module Update exposing (init, update)
 
 import Box
+import Debug
 import Game
 import Math.Vector3 exposing (vec3)
 import Model exposing (Model, State(..))
@@ -32,6 +33,13 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        MousePosition position ->
+            let
+                dgb =
+                    Debug.log "New mouse position=" <| toString position
+            in
+            ( model, Cmd.none )
+
         SetViewport size ->
             ( { model
                 | renderer = Renderer.setViewport size model.renderer

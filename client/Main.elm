@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Html
 import Model exposing (Model)
+import Mouse
 import Msg exposing (Msg(..))
 import Update exposing (init, update)
 import View exposing (view)
@@ -20,4 +21,4 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Window.resizes SetViewport
+    Sub.batch [ Window.resizes SetViewport, Mouse.moves MousePosition ]
