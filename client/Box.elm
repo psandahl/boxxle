@@ -22,7 +22,7 @@ type alias Vertex =
     { position : Vec3
     , normal : Vec3
     , tangent : Vec3
-    , binormal : Vec3
+    , bitangent : Vec3
     , texCoord : Vec2
     }
 
@@ -109,25 +109,25 @@ side ( ll, lr, ul, ur ) =
     [ { position = vec3 0.5 0.5 0.5
       , normal = front
       , tangent = right
-      , binormal = up
+      , bitangent = up
       , texCoord = ur
       }
     , { position = vec3 -0.5 0.5 0.5
       , normal = front
       , tangent = right
-      , binormal = up
+      , bitangent = up
       , texCoord = ul
       }
     , { position = vec3 -0.5 -0.5 0.5
       , normal = front
       , tangent = right
-      , binormal = up
+      , bitangent = up
       , texCoord = ll
       }
     , { position = vec3 0.5 -0.5 0.5
       , normal = front
       , tangent = right
-      , binormal = up
+      , bitangent = up
       , texCoord = lr
       }
     ]
@@ -223,7 +223,7 @@ vertexShader :
         { vPosition : Vec3
         , vNormal : Vec3
         , vTangent : Vec3
-        , vBinormal : Vec3
+        , vBitangent : Vec3
         , vTexCoord : Vec2
         }
 vertexShader =
@@ -233,7 +233,7 @@ vertexShader =
         attribute vec3 position;
         attribute vec3 normal;
         attribute vec3 tangent;
-        attribute vec3 binormal;
+        attribute vec3 bitangent;
         attribute vec2 texCoord;
 
         uniform mat4 projectionMatrix;
@@ -243,7 +243,7 @@ vertexShader =
         varying vec3 vPosition;
         varying vec3 vNormal;
         varying vec3 vTangent;
-        varying vec3 vBinormal;
+        varying vec3 vBitangent;
         varying vec2 vTexCoord;
 
         void main()
@@ -253,7 +253,7 @@ vertexShader =
             vPosition = (mvMatrix * vec4(position, 1.0)).xyz;
             vNormal = (mvMatrix * vec4(normal, 0.0)).xyz;
             vTangent = (mvMatrix * vec4(tangent, 0.0)).xyz;
-            vBinormal = (mvMatrix * vec4(binormal, 0.0)).xyz;
+            vBitangent = (mvMatrix * vec4(bitangent, 0.0)).xyz;
             vTexCoord = texCoord;
 
             mat4 mvpMatrix = projectionMatrix * mvMatrix;
@@ -272,7 +272,7 @@ fragmentShader :
         { vPosition : Vec3
         , vNormal : Vec3
         , vTangent : Vec3
-        , vBinormal : Vec3
+        , vBitangent : Vec3
         , vTexCoord : Vec2
         }
 fragmentShader =
@@ -286,7 +286,7 @@ fragmentShader =
         varying vec3 vPosition;
         varying vec3 vNormal;
         varying vec3 vTangent;
-        varying vec3 vBinormal;
+        varying vec3 vBitangent;
         varying vec2 vTexCoord;
 
         // From right behind.
@@ -335,7 +335,7 @@ fragmentShader =
             vec3 normal = texture2D(normalMap, vTexCoord).rgb;
             normal = normal * 2.0 - vec3(1.0);
 
-            mat3 tbn = mat3(normalize(vTangent), normalize(vBinormal), normalize(vNormal));
+            mat3 tbn = mat3(normalize(vTangent), normalize(vBitangent), normalize(vNormal));
             return normalize(tbn * normal);
         }
 
