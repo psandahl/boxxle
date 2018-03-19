@@ -36,7 +36,7 @@ update msg model =
         MousePosition position ->
             let
                 dgb =
-                    Debug.log "New mouse position=" <| toString position
+                    Debug.log "Mouse ray=" <| Renderer.getMouseRay position model.renderer
             in
             ( model, Cmd.none )
 

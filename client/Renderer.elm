@@ -1,10 +1,12 @@
-module Renderer exposing (Renderer, init, setViewport, viewScene)
+module Renderer exposing (Renderer, getMouseRay, init, setViewport, viewScene)
 
 import Box exposing (Box)
+import Debug
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Math.Matrix4 as Linear exposing (Mat4)
-import Math.Vector3 as Linear exposing (Vec3)
+import Math.Vector3 exposing (Vec3, normalize, vec3)
+import Mouse exposing (Position)
 import Msg exposing (Msg)
 import WebGL as GL
 import Window exposing (Size)
@@ -16,7 +18,9 @@ import Window exposing (Size)
 type alias Renderer =
     { viewport : Size
     , perspectiveMatrix : Mat4
+    , invertedPerspectiveMatrix : Mat4
     , viewMatrix : Mat4
+    , invertedViewMatrix : Mat4
     }
 
 
@@ -26,12 +30,20 @@ type alias Renderer =
 
 init : Renderer
 init =
+    let
+        persp =
+            perspectiveFromViewport defaultViewport
+
+        view =
+            Linear.makeLookAt (vec3 -3 4 4)
+                (vec3 0 0 0)
+                (vec3 0 1 0)
+    in
     { viewport = defaultViewport
-    , perspectiveMatrix = perspectiveFromViewport defaultViewport
-    , viewMatrix =
-        Linear.makeLookAt (Linear.vec3 -2 4 4)
-            (Linear.vec3 0 0 0)
-            (Linear.vec3 0 1 0)
+    , perspectiveMatrix = persp
+    , invertedPerspectiveMatrix = invertOrCrash persp
+    , viewMatrix = view
+    , invertedViewMatrix = invertOrCrash view
     }
 
 
@@ -41,9 +53,14 @@ init =
 
 setViewport : Size -> Renderer -> Renderer
 setViewport size renderer =
+    let
+        persp =
+            perspectiveFromViewport size
+    in
     { renderer
         | viewport = size
-        , perspectiveMatrix = perspectiveFromViewport size
+        , perspectiveMatrix = persp
+        , invertedPerspectiveMatrix = invertOrCrash persp
     }
 
 
@@ -68,6 +85,58 @@ viewScene renderer boxes =
                 renderer.viewMatrix
             )
             boxes
+
+
+
+{- Get a ray from eye position - center of screen - pointing in the direction
+   of the mouse cursor, and using the perspective information to get depth.
+-}
+
+
+getMouseRay : Position -> Renderer -> Vec3
+getMouseRay position renderer =
+    let
+        ndc =
+            normalizedDeviceCoordinates position renderer.viewport
+
+        eye =
+            eyeCoordinates ndc renderer.invertedPerspectiveMatrix
+
+        world =
+            worldCoordinates eye renderer.invertedViewMatrix
+    in
+    normalize world
+
+
+normalizedDeviceCoordinates : Position -> Size -> ( Float, Float )
+normalizedDeviceCoordinates position viewport =
+    ( ((2 * toFloat position.x) / toFloat viewport.width) - 1
+    , 1 - ((2 * toFloat position.y) / toFloat viewport.height)
+    )
+
+
+eyeCoordinates : ( Float, Float ) -> Mat4 -> Vec3
+eyeCoordinates ( ndcX, ndcY ) invertedPerspectiveMatrix =
+    let
+        vec =
+            vec3 ndcX ndcY 1
+    in
+    Linear.transform invertedPerspectiveMatrix vec
+
+
+worldCoordinates : Vec3 -> Mat4 -> Vec3
+worldCoordinates vec invertedViewMatrix =
+    Linear.transform invertedViewMatrix vec
+
+
+invertOrCrash : Mat4 -> Mat4
+invertOrCrash matrix =
+    case Linear.inverse matrix of
+        Just invMatrix ->
+            invMatrix
+
+        Nothing ->
+            Debug.crash "Cannot invert matrix"
 
 
 defaultViewport : Size
