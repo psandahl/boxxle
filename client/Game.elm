@@ -1,28 +1,28 @@
 module Game exposing (Game, boxes, init)
 
-import Graphics.Box as Graphics exposing (Box, Vertex)
-import Math.Vector3 exposing (vec3)
+import Game.BoxGrid as BoxGrid exposing (BoxGrid)
+import Graphics.Box
 import WebGL exposing (Mesh)
 import WebGL.Texture exposing (Texture)
 
 
 type alias Game =
-    { boxMesh : Mesh Vertex
+    { boxMesh : Mesh Graphics.Box.Vertex
     , normalMap : Texture
     , specularMap : Texture
-    , dummyBox : Box
+    , boxGrid : BoxGrid
     }
 
 
-init : Mesh Vertex -> Texture -> Texture -> Game
+init : Mesh Graphics.Box.Vertex -> Texture -> Texture -> Game
 init boxMesh normalMap specularMap =
     { boxMesh = boxMesh
     , normalMap = normalMap
     , specularMap = specularMap
-    , dummyBox = Graphics.init boxMesh normalMap specularMap <| vec3 2 0 0
+    , boxGrid = BoxGrid.init boxMesh normalMap specularMap
     }
 
 
-boxes : Game -> List Box
+boxes : Game -> List Graphics.Box.Box
 boxes game =
-    [ game.dummyBox ]
+    BoxGrid.renderBoxes game.boxGrid
