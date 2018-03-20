@@ -1,7 +1,14 @@
-module Renderer exposing (Renderer, getMouseRay, init, setViewport, viewScene)
+module Graphics.Renderer
+    exposing
+        ( Renderer
+        , getMouseRay
+        , init
+        , setViewport
+        , viewScene
+        )
 
-import Box exposing (Box)
 import Debug
+import Graphics.Box as Box exposing (Box)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Math.Matrix4 as Linear exposing (Mat4)

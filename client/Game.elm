@@ -1,6 +1,6 @@
 module Game exposing (Game, boxes, init)
 
-import Box exposing (Box, Vertex)
+import Graphics.Box as Graphics exposing (Box, Vertex)
 import Math.Vector3 exposing (vec3)
 import WebGL exposing (Mesh)
 import WebGL.Texture exposing (Texture)
@@ -19,7 +19,7 @@ init boxMesh normalMap specularMap =
     { boxMesh = boxMesh
     , normalMap = normalMap
     , specularMap = specularMap
-    , dummyBox = Box.init boxMesh normalMap specularMap <| vec3 2 0 0
+    , dummyBox = Graphics.init boxMesh normalMap specularMap <| vec3 2 0 0
     }
 
 

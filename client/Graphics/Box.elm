@@ -1,4 +1,11 @@
-module Box exposing (Box, Vertex, init, makeMesh, toEntity)
+module Graphics.Box
+    exposing
+        ( Box
+        , Vertex
+        , init
+        , makeMesh
+        , toEntity
+        )
 
 import Debug
 import Math.Matrix4 as Linear exposing (Mat4)

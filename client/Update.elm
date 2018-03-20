@@ -1,12 +1,12 @@
 module Update exposing (init, update)
 
-import Box
 import Debug
 import Game
+import Graphics.Box as Box
+import Graphics.Renderer as Renderer
 import Math.Vector3 exposing (vec3)
 import Model exposing (Model, State(..))
 import Msg exposing (Msg(..))
-import Renderer
 import Task
 import WebGL.Texture as Texture
 import Window

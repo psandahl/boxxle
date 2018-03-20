@@ -1,7 +1,7 @@
 module Model exposing (Model, State(..))
 
 import Game exposing (Game)
-import Renderer exposing (Renderer)
+import Graphics.Renderer exposing (Renderer)
 
 
 {- Game states -}

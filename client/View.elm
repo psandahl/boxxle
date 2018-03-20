@@ -2,10 +2,10 @@ module View exposing (view)
 
 import Debug
 import Game
+import Graphics.Renderer as Renderer
 import Html exposing (Html)
 import Model exposing (Model, State(..))
 import Msg exposing (Msg)
-import Renderer
 
 
 view : Model -> Html Msg
