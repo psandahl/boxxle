@@ -32,7 +32,7 @@ type alias Renderer =
 
 
 
-{- Initialize a renderer with a default viewport. -}
+{- Initialize a renderer with a default viewport and a camera located at origo. -}
 
 
 init : Renderer
@@ -42,8 +42,8 @@ init =
             perspectiveFromViewport defaultViewport
 
         view =
-            Linear.makeLookAt (vec3 -3 4 4)
-                (vec3 0 0 0)
+            Linear.makeLookAt (vec3 0 0 0)
+                (vec3 0 -1 -1)
                 (vec3 0 1 0)
     in
     { viewport = defaultViewport
