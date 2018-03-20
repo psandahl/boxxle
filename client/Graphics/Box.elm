@@ -117,7 +117,7 @@ bottomSide =
 
 topSide : List Vertex
 topSide =
-    transformSide (side switchTexture) <|
+    transformSide (side blankTexture) <|
         Linear.makeRotate -halfPi <|
             vec3 1 0 0
 
@@ -382,7 +382,7 @@ fragmentShader =
         {
             vec3 reflectDir = reflect(-transformedLightDir, normal);
             vec3 viewDir = normalize(vec3(0.0) - vPosition);
-            float specular = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+            float specular = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
 
             float shine = texture2D(specularMap, vTexCoord).r;
 
