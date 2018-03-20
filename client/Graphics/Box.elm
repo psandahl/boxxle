@@ -117,7 +117,7 @@ bottomSide =
 
 topSide : List Vertex
 topSide =
-    transformSide (side blankTexture) <|
+    transformSide (side switchTexture) <|
         Linear.makeRotate -halfPi <|
             vec3 1 0 0
 
@@ -312,9 +312,9 @@ fragmentShader =
         varying vec2 vTexCoord;
 
         // From right behind.
-        vec3 light1 = normalize(vec3(1.0, 1.0, 1.0));
+        vec3 light1 = normalize(vec3(1.0, -3.0, 1.0));
         // From left behind.
-        vec3 light2 = normalize(vec3(-1.0, 1.0, 1.0));
+        vec3 light2 = normalize(vec3(-1.0, -3.0, 1.0));
         // From above and in front.
         vec3 light3 = normalize(vec3(0.0, 1.0, -1.0));
         // From back and below.
@@ -363,7 +363,7 @@ fragmentShader =
 
         vec3 fragColor()
         {
-            return vec3(0.91, 0.91, 0.91);
+            return vec3(0.95, 0.95, 0.95);
         }
 
         vec3 ambientLight()
