@@ -1,4 +1,4 @@
-module Game.Intersect exposing (AxisAlignedBoundingBox, intersect, makeAabb)
+module Game.AxisAlignedBoundingBox exposing (AxisAlignedBoundingBox, intersect, makeAabb)
 
 import Math.Vector3 exposing (Vec3, getX, getY, getZ, vec3)
 

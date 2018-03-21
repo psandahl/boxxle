@@ -1,6 +1,7 @@
-module Game.BoxGrid exposing (BoxGrid, init, renderBoxes)
+module Game.BoxGrid exposing (BoxGrid, init, intersect, renderBoxes)
 
 import Array exposing (Array)
+import Game.AxisAlignedBoundingBox as Aabb
 import Game.Box
 import Graphics.Box
 import Math.Vector3 exposing (Vec3, add, sub, vec3)
@@ -33,6 +34,24 @@ init mesh normalMap specularMap =
 renderBoxes : BoxGrid -> List Graphics.Box.Box
 renderBoxes boxGrid =
     Array.foldl (\box list -> box.box :: list) [] boxGrid.boxes
+
+
+intersect : Vec3 -> BoxGrid -> List Int
+intersect =
+    intersectBoxIndices 0 []
+
+
+intersectBoxIndices : Int -> List Int -> Vec3 -> BoxGrid -> List Int
+intersectBoxIndices index indices ray boxGrid =
+    case Array.get index boxGrid.boxes of
+        Just box ->
+            if Aabb.intersect ray box.boundingBox then
+                intersectBoxIndices (index + 1) (index :: indices) ray boxGrid
+            else
+                intersectBoxIndices (index + 1) indices ray boxGrid
+
+        Nothing ->
+            indices
 
 
 gridSize : Int

@@ -35,10 +35,14 @@ update msg model =
     case msg of
         MousePosition position ->
             let
-                dgb =
-                    Debug.log "Mouse ray=" <| Renderer.getMouseRay position model.renderer
+                ray =
+                    Renderer.getMouseRay position model.renderer
             in
-            ( model, Cmd.none )
+            ( { model
+                | game = Maybe.map (Game.intersect ray) model.game
+              }
+            , Cmd.none
+            )
 
         SetViewport size ->
             ( { model
