@@ -129,7 +129,7 @@ bottomSide =
 
 topSide : List Vertex
 topSide =
-    transformSide (side blankTexture) <|
+    transformSide (side switchTexture) <|
         Linear.makeRotate -halfPi <|
             vec3 1 0 0
 
