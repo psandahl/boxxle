@@ -2,6 +2,7 @@ module Graphics.Box
     exposing
         ( Box
         , Vertex
+        , highlight
         , init
         , makeMesh
         , toEntity
@@ -25,6 +26,7 @@ type alias Box =
     , normalMap : Texture
     , specularMap : Texture
     , modelMatrix : Mat4
+    , highLighted : Bool
     }
 
 
@@ -51,7 +53,17 @@ init mesh normalMap specularMap origin =
     , normalMap = normalMap
     , specularMap = specularMap
     , modelMatrix = Linear.makeTranslate origin
+    , highLighted = False
     }
+
+
+
+{- Set the highlight value for the box. -}
+
+
+highlight : Bool -> Box -> Box
+highlight value box =
+    { box | highLighted = value }
 
 
 
@@ -187,7 +199,16 @@ toEntity projectionMatrix viewMatrix box =
         , modelMatrix = box.modelMatrix
         , normalMap = box.normalMap
         , specularMap = box.specularMap
+        , highlightMix = highlightMix box.highLighted
         }
+
+
+highlightMix : Bool -> Float
+highlightMix value =
+    if value then
+        0.3
+    else
+        0.0
 
 
 front : Vec3
@@ -290,6 +311,7 @@ fragmentShader :
             | viewMatrix : Mat4
             , normalMap : Texture
             , specularMap : Texture
+            , highlightMix : Float
         }
         { vPosition : Vec3
         , vNormal : Vec3
@@ -304,12 +326,15 @@ fragmentShader =
         uniform mat4 viewMatrix;
         uniform sampler2D normalMap;
         uniform sampler2D specularMap;
+        uniform float highlightMix;
 
         varying vec3 vPosition;
         varying vec3 vNormal;
         varying vec3 vTangent;
         varying vec3 vBitangent;
         varying vec2 vTexCoord;
+
+        vec3 highlightColor = vec3(1.0);
 
         // From right behind.
         vec3 light1 = normalize(vec3(1.0, -3.0, 1.0));
@@ -349,7 +374,7 @@ fragmentShader =
             vec3 color = fragColor() *
                 (ambientLight() + diffuse / 4.0 + specular / 4.0);
 
-            gl_FragColor = vec4(color, 1.0);
+            gl_FragColor = vec4(mix(color, highlightColor, highlightMix), 1.0);
         }
 
         vec3 bumpedNormal()

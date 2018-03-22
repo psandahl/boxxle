@@ -1,6 +1,5 @@
-module Game exposing (Game, boxes, init, intersect)
+module Game exposing (Game, boxes, init, mouseOver)
 
-import Debug
 import Game.BoxGrid as BoxGrid exposing (BoxGrid)
 import Graphics.Box
 import Math.Vector3 exposing (Vec3)
@@ -39,13 +38,9 @@ boxes game =
 
 
 
-{- Intersect the mouse with entities in the game. -}
+{- Handle intersect due to mouse move. -}
 
 
-intersect : Vec3 -> Game -> Game
-intersect ray game =
-    let
-        indices =
-            Debug.log "Indices: " <| BoxGrid.intersect ray game.boxGrid
-    in
-    game
+mouseOver : Vec3 -> Game -> Game
+mouseOver ray game =
+    { game | boxGrid = BoxGrid.mouseOver ray game.boxGrid }

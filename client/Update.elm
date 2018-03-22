@@ -39,7 +39,7 @@ update msg model =
                     Renderer.getMouseRay position model.renderer
             in
             ( { model
-                | game = Maybe.map (Game.intersect ray) model.game
+                | game = Maybe.map (Game.mouseOver ray) model.game
               }
             , Cmd.none
             )

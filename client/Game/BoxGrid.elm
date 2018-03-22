@@ -1,4 +1,4 @@
-module Game.BoxGrid exposing (BoxGrid, init, intersect, renderBoxes)
+module Game.BoxGrid exposing (BoxGrid, init, mouseOver, renderBoxes)
 
 import Array exposing (Array)
 import Game.AxisAlignedBoundingBox as Aabb
@@ -11,6 +11,7 @@ import WebGL.Texture exposing (Texture)
 
 type alias BoxGrid =
     { boxes : Array Game.Box.Box
+    , mouseOverBoxIndex : Maybe Int
     }
 
 
@@ -28,12 +29,57 @@ init mesh normalMap specularMap =
                 in
                 Game.Box.init mesh normalMap specularMap <| gridPointAt row col
             )
+    , mouseOverBoxIndex = Nothing
     }
 
 
 renderBoxes : BoxGrid -> List Graphics.Box.Box
 renderBoxes boxGrid =
     Array.foldl (\box list -> box.box :: list) [] boxGrid.boxes
+
+
+mouseOver : Vec3 -> BoxGrid -> BoxGrid
+mouseOver ray boxGrid =
+    case intersect ray boxGrid of
+        Just newIndex ->
+            case boxGrid.mouseOverBoxIndex of
+                Just oldIndex ->
+                    if newIndex == oldIndex then
+                        boxGrid
+                    else
+                        { boxGrid
+                            | mouseOverBoxIndex = Just newIndex
+                            , boxes =
+                                highlight True newIndex <|
+                                    highlight False oldIndex boxGrid.boxes
+                        }
+
+                Nothing ->
+                    { boxGrid
+                        | mouseOverBoxIndex = Just newIndex
+                        , boxes = highlight True newIndex boxGrid.boxes
+                    }
+
+        Nothing ->
+            case boxGrid.mouseOverBoxIndex of
+                Just oldIndex ->
+                    { boxGrid
+                        | mouseOverBoxIndex = Nothing
+                        , boxes = highlight False oldIndex boxGrid.boxes
+                    }
+
+                Nothing ->
+                    boxGrid
+
+
+highlight : Bool -> Int -> Array Game.Box.Box -> Array Game.Box.Box
+highlight value index boxes =
+    case Array.get index boxes of
+        Just box ->
+            Array.set index (Game.Box.highlight value box) boxes
+
+        Nothing ->
+            boxes
 
 
 intersect : Vec3 -> BoxGrid -> Maybe Int

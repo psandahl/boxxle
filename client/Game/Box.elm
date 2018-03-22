@@ -1,4 +1,4 @@
-module Game.Box exposing (Box, compareForIntersect, init)
+module Game.Box exposing (Box, compareForIntersect, highlight, init)
 
 import Game.AxisAlignedBoundingBox exposing (AxisAlignedBoundingBox, makeAabb)
 import Graphics.Box
@@ -31,3 +31,8 @@ compareForIntersect a b =
         GT
     else
         LT
+
+
+highlight : Bool -> Box -> Box
+highlight value box =
+    { box | box = Graphics.Box.highlight value box.box }
