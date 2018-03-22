@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Game.AxisAlignedBoundingBox as Aabb
 import Game.Box
 import Graphics.Box
-import Math.Vector3 exposing (Vec3, add, sub, vec3)
+import Math.Vector3 exposing (Vec3, add, getX, getZ, sub, vec3)
 import WebGL exposing (Mesh)
 import WebGL.Texture exposing (Texture)
 
@@ -36,22 +36,52 @@ renderBoxes boxGrid =
     Array.foldl (\box list -> box.box :: list) [] boxGrid.boxes
 
 
-intersect : Vec3 -> BoxGrid -> List Int
-intersect =
-    intersectBoxIndices 0 []
+intersect : Vec3 -> BoxGrid -> Maybe Int
+intersect ray boxGrid =
+    case intersectBoxes 0 [] ray boxGrid of
+        [] ->
+            Nothing
+
+        [ index ] ->
+            Just index
+
+        indices ->
+            selectMostLikelyBox indices boxGrid
 
 
-intersectBoxIndices : Int -> List Int -> Vec3 -> BoxGrid -> List Int
-intersectBoxIndices index indices ray boxGrid =
+intersectBoxes : Int -> List Int -> Vec3 -> BoxGrid -> List Int
+intersectBoxes index indices ray boxGrid =
     case Array.get index boxGrid.boxes of
         Just box ->
             if Aabb.intersect ray box.boundingBox then
-                intersectBoxIndices (index + 1) (index :: indices) ray boxGrid
+                intersectBoxes (index + 1) (index :: indices) ray boxGrid
             else
-                intersectBoxIndices (index + 1) indices ray boxGrid
+                intersectBoxes (index + 1) indices ray boxGrid
 
         Nothing ->
             indices
+
+
+selectMostLikelyBox : List Int -> BoxGrid -> Maybe Int
+selectMostLikelyBox indices boxGrid =
+    List.head <| List.sortWith (compareForIntersect boxGrid.boxes) indices
+
+
+compareForIntersect : Array Game.Box.Box -> Int -> Int -> Order
+compareForIntersect boxes i1 i2 =
+    let
+        b1 =
+            Array.get i1 boxes
+
+        b2 =
+            Array.get i2 boxes
+    in
+    case ( b1, b2 ) of
+        ( Just box1, Just box2 ) ->
+            Game.Box.compareForIntersect box1 box2
+
+        _ ->
+            GT
 
 
 gridSize : Int
